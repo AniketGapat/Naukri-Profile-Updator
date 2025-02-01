@@ -1,0 +1,30 @@
+name: Naukri Profile Updater
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 9 AM UTC daily (adjust for your timezone)
+    - cron: '0 10 * * *'  # 10 AM UTC daily (adjust for your timezone)
+  workflow_dispatch:   # Allows manual triggering
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Run Profile Updater
+        env:
+          NAUKRI_USERNAME: ${{ secrets.NAUKRI_USERNAME }}
+          NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+        run: mvn exec:java -Dexec.mainClass="Automation.Naukri.NaukriAutomation"
