@@ -21,29 +21,40 @@ public class NaukriAutomation {
 		WebDriverManager.chromedriver().clearDriverCache().setup();
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless"); // Run browser in background
-		options.addArguments("--window-size=1920,1080"); // Sets the browser window size to 1920x1080 pixels
-		options.addArguments("--disable-gpu"); // Disables GPU hardware acceleration.
-		options.addArguments("--no-sandbox"); // Disables the Chrome security sandbox
-		options.addArguments("--disable-dev-shm-usage"); // Prevents Chrome from using /dev/shm (shared memory) for
-															// temporary storage
-		options.addArguments("--enable-javascript"); // Ensures JavaScript execution is enabled in Chrome
+//		options.addArguments("--window-size=1920,1080"); // Sets the browser window size to 1920x1080 pixels
+//		options.addArguments("--disable-gpu"); // Disables GPU hardware acceleration.
+//		options.addArguments("--no-sandbox"); // Disables the Chrome security sandbox
+//		options.addArguments("--disable-dev-shm-usage"); // Prevents Chrome from using /dev/shm (shared memory) for temporary storage
+//		options.addArguments("--enable-javascript"); // Ensures JavaScript execution is enabled in Chrome
+		
+		//options.addArguments("--headless=new");
+		//options.addArguments("--window-size=1920,1080");
+		options.addArguments("--disable-gpu");
+		options.addArguments("--disable-blink-features=AutomationControlled");
+		options.addArguments("--remote-allow-origins=*");
 		WebDriver driver = new ChromeDriver(options);
 
 		try {
 			// Maximize browser window
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+			driver.manage().window().maximize();
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 			// Navigate to Naukri login page
 			driver.get("https://www.naukri.com/nlogin/login");
-
+			System.out.println("URL Hit");
+			Thread.sleep(1000);
+			
 			// Wait until login elements are available
 			WebElement emailField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("usernameField")));
 			WebElement passwordField = driver.findElement(By.id("passwordField"));
 			WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit'][1]"));
 
 			// Enter login credentials
-			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
-			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
+//			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
+//			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
+			
+			emailField.sendKeys("aniketgapat0303@gmail.com");
+			passwordField.sendKeys("Aniket@333");
 
 			// Click login button
 			loginButton.click();
@@ -67,12 +78,15 @@ public class NaukriAutomation {
 			String text = data.getText();
 			System.out.println(text);
 
-			if (text.endsWith(".")) {
-				text = text.substring(0, text.length() - 1); // Remove the last dot
-			} else {
-				text = text + "."; // Add a dot at the end
-			}
-
+//			if (text.endsWith(".")) {
+//				text = text.substring(0, text.length() - 1); // Remove the last dot
+//			} else {
+//				text = text + "."; // Add a dot at the end
+//			}
+			
+			//Use ternary operator instead of if-else
+			text = text.endsWith(".") ? text.substring(0, text.length() - 1) : text + ".";
+			
 			// clear the existing text and add updated text with or without dot
 			data.clear();
 			Thread.sleep(2000);
