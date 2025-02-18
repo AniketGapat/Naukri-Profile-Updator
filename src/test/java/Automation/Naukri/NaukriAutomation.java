@@ -50,11 +50,8 @@ public class NaukriAutomation {
 			WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit'][1]"));
 
 			// Enter login credentials
-//			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
-//			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
-			
-			emailField.sendKeys("aniketgapat0303@gmail.com");
-			passwordField.sendKeys("Aniket@333");
+			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
+			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
 
 			// Click login button
 			loginButton.click();
