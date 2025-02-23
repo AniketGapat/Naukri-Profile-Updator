@@ -71,7 +71,7 @@ public class NaukriAutomation {
 			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
 			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
 			getScreenshot("test1", driver);
-			
+      
 			// Click login button
 			loginButton.click();
 			System.out.println("Profile SignIn");
