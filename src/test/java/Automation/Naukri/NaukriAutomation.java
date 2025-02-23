@@ -1,9 +1,14 @@
 package Automation.Naukri;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -11,39 +16,52 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class NaukriAutomation {
-
-	public static void main(String[] args) {
+	
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	public void getScreenshot(String testCaseName, WebDriver driver) throws IOException {
+		TakesScreenshot ts = (TakesScreenshot)driver;
+		File source = ts.getScreenshotAs(OutputType.FILE);
+		File file = new File(System.getProperty("user.dir") +"//reports//" + testCaseName +".png");
+		FileUtils.copyFile(source, file);
+	}
+	
+	@BeforeClass
+	public void naukriLogin() throws InterruptedException, IOException {
 		// Set up WebDriver
 		WebDriverManager.chromedriver().clearDriverCache().setup();
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless"); // Run browser in background
-//		options.addArguments("--window-size=1920,1080"); // Sets the browser window size to 1920x1080 pixels
-//		options.addArguments("--disable-gpu"); // Disables GPU hardware acceleration.
-//		options.addArguments("--no-sandbox"); // Disables the Chrome security sandbox
-//		options.addArguments("--disable-dev-shm-usage"); // Prevents Chrome from using /dev/shm (shared memory) for temporary storage
-//		options.addArguments("--enable-javascript"); // Ensures JavaScript execution is enabled in Chrome
-		
-		//options.addArguments("--headless=new");
-		//options.addArguments("--window-size=1920,1080");
-		options.addArguments("--disable-gpu");
+		options.addArguments("--headless=new"); // Run browser in background
+		options.addArguments("--window-size=1920,1080"); // Sets the browser window size to 1920x1080 pixels
+		options.addArguments("--disable-gpu"); // Disables GPU hardware acceleration.
+		options.addArguments("--no-sandbox"); // Disables the Chrome security sandbox
+		options.addArguments("--disable-dev-shm-usage"); // Prevents Chrome from using /dev/shm (shared memory) for temporary storage
+		options.addArguments("--enable-javascript"); // Ensures JavaScript execution is enabled in Chrome
 		options.addArguments("--disable-blink-features=AutomationControlled");
 		options.addArguments("--remote-allow-origins=*");
-		WebDriver driver = new ChromeDriver(options);
+		driver = new ChromeDriver(options);
+		
+		// Maximize browser window
+		driver.manage().window().maximize();
+		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
+		// Navigate to Naukri login page
+		driver.get("https://www.naukri.com/nlogin/login");
+		System.out.println("URL Hit");
+		Thread.sleep(1000);
+		getScreenshot("test", driver);
+	}
+		@Test
+		public void updateHeadline() {
 		try {
-			// Maximize browser window
-			driver.manage().window().maximize();
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-			// Navigate to Naukri login page
-			driver.get("https://www.naukri.com/nlogin/login");
-			System.out.println("URL Hit");
-			Thread.sleep(1000);
-			
 			// Wait until login elements are available
 			WebElement emailField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("usernameField")));
 			WebElement passwordField = driver.findElement(By.id("passwordField"));
@@ -52,7 +70,8 @@ public class NaukriAutomation {
 			// Enter login credentials
 			emailField.sendKeys(System.getenv("NAUKRI_USERNAME")); // Email from environment variable
 			passwordField.sendKeys(System.getenv("NAUKRI_PASSWORD")); // Password from environment variable
-
+			getScreenshot("test1", driver);
+      
 			// Click login button
 			loginButton.click();
 			System.out.println("Profile SignIn");
@@ -74,12 +93,6 @@ public class NaukriAutomation {
 			WebElement data = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("resumeHeadlineTxt")));
 			String text = data.getText();
 			System.out.println(text);
-
-//			if (text.endsWith(".")) {
-//				text = text.substring(0, text.length() - 1); // Remove the last dot
-//			} else {
-//				text = text + "."; // Add a dot at the end
-//			}
 			
 			//Use ternary operator instead of if-else
 			text = text.endsWith(".") ? text.substring(0, text.length() - 1) : text + ".";
@@ -88,7 +101,8 @@ public class NaukriAutomation {
 			data.clear();
 			Thread.sleep(2000);
 			data.sendKeys(text);
-
+			getScreenshot("test2", driver);
+			
 			// Update profile by clicking on a button or filling a field
 			WebElement saveButton = wait
 					.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Save']")));
@@ -112,8 +126,13 @@ public class NaukriAutomation {
 		} catch (Exception e) {
 			System.out.println("Exception Type: " + e.getClass().getName());
 			System.out.println("Exception Message: " + e.getMessage());
-		} finally {
-			driver.quit();
-		}
+		} 
 	}
+		
+		@AfterClass
+		public void tearDown() {
+			if (driver != null) {
+                driver.quit();
+            }
+		}
 }
